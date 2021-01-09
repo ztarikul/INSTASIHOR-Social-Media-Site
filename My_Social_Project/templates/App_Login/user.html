@@ -1,0 +1,103 @@
+{% extends 'navbar.html' %}
+
+{% block title_block %} {{ user.user_profile.full_name }} (@{{user.username}}) {% endblock %}
+
+{% block css_block %}
+<style>
+  .crop{
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+  }
+  .crop img{
+    width: 400px;
+    height: 300px;
+    margin: -75px 0 0 -100px;
+  }
+</style>
+{% endblock %}
+
+{% block body_block %}
+<div class="row">
+    <div class="col-sm-4">
+        {% if user.user_profile.profile_pic %}
+          <img src="/media/{{user.user_profile.profile_pic}}" width="250px" height="250px" class="rounded-circle">
+        {% else %}
+          <img src="/media/default.png" width="250px" height="250px" class="rounded-circle">
+        {% endif %}
+    </div>
+    <div class="col-sm-8">
+        <h3>{{user.username}} &nbsp; <a href="{% url 'App_Login:edit' %}" class="btn btn-light">Edit</a></h3>
+        <br>
+        <h4>{{user.post.count}} posts &nbsp; &nbsp; {{user.following.count}} followers &nbsp; &nbsp; {{user.follower.count}} following &nbsp; &nbsp;</h4>
+        <br>
+        <h3>{{user.user_profile.full_name}}</h3>
+        <h6>{{user.user_profile.bio|linebreaks}}</h6>
+
+    </div>
+
+</div>
+<hr>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  New Post
+</button>
+
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Post a Photo</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form method="POST" enctype="multipart/form-data">
+          {{form.as_p}}
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-sm">Post</button>
+        </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<div class="row">
+  <div class="col-sm-8">
+    {% for post in user.post.all %}
+    <div style="border: 1px solid #888888;">
+      <img src="/media/{{post.image}}" width="100%">
+      <br>
+      <div style="padding: 20px">
+          {% if post.pk in liked_post_list %}
+          <a href="{% url 'App_Posts:unliked' pk=post.pk %}"><i class="fa fa-heart" style="font-size:30px"></i></a>
+          {% else %}
+          <a href="{% url 'App_Posts:liked' pk=post.pk %}"><i class="fa fa-heart-o" style="font-size:30px"></i></a>
+          {% endif %}
+          <h6>{{post.liked_post.count}} Likes</h6>
+      </div>
+      <b>&nbsp;{{post.author}}</b>&nbsp;{{post.caption}}
+    </div>
+    <br>
+    <br>
+    {% endfor %} 
+  </div>
+  &nbsp;
+  
+  <div class="col-sm-4">
+
+  </div>
+</div>
+
+
+
+{% endblock %}
